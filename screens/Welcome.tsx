@@ -7,6 +7,7 @@ import {
   Layout,
   Text,
   Icon,
+  Divider,
 } from "@ui-kitten/components";
 import { default as theme } from "../constants/theme.json";
 
@@ -18,7 +19,10 @@ const Welcome: FC<WelcomeProps> = ({ navigation }) => {
   const navigationLogin = () => {
     navigation.navigate("Login");
   };
-  const FacebookIcon = (props: any) => <Icon {...props} name="facebook" />;
+  const navigationSignup = () => {
+    navigation.navigate("Signup");
+  };
+  const GithubIcon = (props: any) => <Icon {...props} name="github" />;
   const GmailIcon = (props: any) => <Icon {...props} name="google" />;
   const TwitterIcon = (props: any) => <Icon {...props} name="twitter" />;
   return (
@@ -32,11 +36,16 @@ const Welcome: FC<WelcomeProps> = ({ navigation }) => {
           </Button>
         </Layout>
         <Layout style={styles.button}>
-          <Button style={styles.buttonStyle}>Sign Up</Button>
+          <Button onPress={navigationSignup} style={styles.buttonStyle}>
+            Sign Up
+          </Button>
         </Layout>
       </Layout>
+      <Divider style={{ alignContent: "center", backgroundColor: "#fff" }} />
+      <Text category="s1">Iniciar sesion con:</Text>
+
       <Layout style={styles.iconsContainer}>
-        <Button style={styles.buttonLogin} accessoryLeft={FacebookIcon} />
+        <Button style={styles.buttonLogin} accessoryLeft={GithubIcon} />
         <Button style={styles.buttonLogin} accessoryLeft={GmailIcon} />
         <Button style={styles.buttonLogin} accessoryLeft={TwitterIcon} />
       </Layout>
@@ -77,6 +86,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme["color-primary-300"],
     flexDirection: "row",
     marginHorizontal: 5,
+    marginVertical: 10,
   },
   buttonLogin: {
     marginVertical: 8,
