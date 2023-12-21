@@ -8,29 +8,37 @@ import {
   Text,
   Icon,
 } from "@ui-kitten/components";
-import { StatusBar } from "expo-status-bar";
 import { default as theme } from "../constants/theme.json";
 
-interface WelcomeProps {}
+type WelcomeProps = {
+  navigation: any;
+};
 
-const Welcome: FC<WelcomeProps> = ({}) => {
-  const GitIcon = (props: any) => <Icon {...props} name="github" />;
+const Welcome: FC<WelcomeProps> = ({ navigation }) => {
+  const navigationLogin = () => {
+    navigation.navigate("Login");
+  };
+  const FacebookIcon = (props: any) => <Icon {...props} name="facebook" />;
   const GmailIcon = (props: any) => <Icon {...props} name="google" />;
+  const TwitterIcon = (props: any) => <Icon {...props} name="twitter" />;
   return (
     <Layout style={styles.container}>
       <Text category="h1">Bienvenido</Text>
       <Text category="s1">Para continuar registrate o inicia sesion!!</Text>
       <Layout style={styles.buttonContainer}>
         <Layout style={styles.button}>
-          <Button style={styles.buttonStyle}>Login</Button>
+          <Button onPress={navigationLogin} style={styles.buttonStyle}>
+            Login
+          </Button>
         </Layout>
         <Layout style={styles.button}>
           <Button style={styles.buttonStyle}>Sign Up</Button>
         </Layout>
       </Layout>
       <Layout style={styles.iconsContainer}>
-        <Button style={styles.buttonStyle} accessoryLeft={GitIcon}></Button>
-        <Button style={styles.buttonStyle} accessoryLeft={GmailIcon}></Button>
+        <Button style={styles.buttonLogin} accessoryLeft={FacebookIcon} />
+        <Button style={styles.buttonLogin} accessoryLeft={GmailIcon} />
+        <Button style={styles.buttonLogin} accessoryLeft={TwitterIcon} />
       </Layout>
     </Layout>
   );
@@ -40,36 +48,42 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
 
-    backgroundColor: theme["color-primary-100"],
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: theme["color-primary-300"],
   },
   buttonContainer: {
-    backgroundColor: theme["color-primary-100"],
     flexDirection: "row",
     marginHorizontal: 3,
     alignItems: "center",
-
+    backgroundColor: theme["color-primary-300"],
     marginVertical: 25,
   },
   button: {
-    backgroundColor: theme["color-primary-100"],
+    backgroundColor: theme["color-primary-300"],
     marginTop: 10,
     marginHorizontal: 10,
     flex: 1,
   },
   buttonStyle: {
     borderRadius: 28,
-    marginHorizontal: 6,
+    marginHorizontal: 1,
   },
   stl: {
     opacity: 0.75,
     backgroundColor: "blue",
   },
   iconsContainer: {
-    backgroundColor: theme["color-primary-100"],
+    backgroundColor: theme["color-primary-300"],
     flexDirection: "row",
     marginHorizontal: 5,
+  },
+  buttonLogin: {
+    marginVertical: 8,
+    width: 50,
+    height: 50,
+    borderRadius: 50,
+    marginHorizontal: 8,
   },
 });
 export default Welcome;

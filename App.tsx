@@ -10,18 +10,29 @@ import * as eva from "@eva-design/eva";
 import Welcome from "./screens/Welcome";
 import { default as theme } from "./constants/theme.json";
 import { EvaIconsPack } from "@ui-kitten/eva-icons";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import Login from "./screens/Login";
+
+const { Navigator, Screen } = createStackNavigator();
 function App() {
   return (
-    <View style={styles.container}>
-      <Welcome />
+    <>
       <StatusBar style="auto" />
-    </View>
+
+      <NavigationContainer>
+        <Navigator screenOptions={{ headerShown: false }}>
+          <Screen name="Welcome" component={Welcome} />
+          <Screen name="Login" component={Login} />
+        </Navigator>
+      </NavigationContainer>
+    </>
   );
 }
 export default () => (
   <>
     <IconRegistry icons={EvaIconsPack} />
-    <ApplicationProvider {...eva} theme={{ ...eva.light, ...theme }}>
+    <ApplicationProvider {...eva} theme={{ ...eva.dark, ...theme }}>
       <App />
     </ApplicationProvider>
   </>
@@ -29,7 +40,7 @@ export default () => (
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme["color-primary-700"],
+
     alignItems: "center",
     justifyContent: "center",
   },
