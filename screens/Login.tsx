@@ -1,18 +1,20 @@
 import {
-  Avatar,
   Button,
-  Card,
   Icon,
   Input,
   Layout,
-  Modal,
   Text,
   TopNavigation,
   TopNavigationAction,
 } from "@ui-kitten/components";
 import React, { FC, useState } from "react";
-import { default as theme } from "../constants/theme.json";
-import { Alert, SafeAreaView, StyleSheet, View } from "react-native";
+import { legacy_createStore as createStore } from "redux";
+import { StyleSheet } from "react-native";
+import { signIn } from "../auth/singin";
+import ErrorCard from "../components/ErrorCard";
+import { theme } from "../constants/theme";
+import { useAtom } from "jotai";
+import { atomWithStore } from "jotai-redux";
 
 interface LoginProps {
   navigation: any;
@@ -21,11 +23,32 @@ type tForm = {
   email: string;
   password: string;
 };
+type TInitialState = { token: string };
+const initialState: TInitialState = { token: "" };
+
+type TActionType = {
+  type: "login" | "";
+  payload: any;
+};
+
+const reducer = (state = initialState, action: TActionType) => {
+  switch (action.type) {
+    case "login":
+      return { ...state, token: action.payload };
+    default:
+      return state;
+  }
+};
+const store = createStore<TInitialState, TActionType, {}, {}>(reducer);
+const storeAtom = atomWithStore(store);
+
 const Login: FC<LoginProps> = ({ navigation }) => {
+  const [state, dispatch] = useAtom(storeAtom);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [submit, setSubmit] = useState<tForm>({ email: "", password: "" });
   const [disabled, setDisabled] = useState<boolean>(false);
+
   const BackIcon = (props: any) => <Icon {...props} name="arrow-back" />;
   const UserIcon = (props: any) => (
     <Icon {...props} fill="#fff" name="person" />
@@ -38,13 +61,19 @@ const Login: FC<LoginProps> = ({ navigation }) => {
   const BackAction = () => (
     <TopNavigationAction icon={BackIcon} onPress={navigateBack} />
   );
-  const onSubmit = () => {
+  const onSubmit = async () => {
     if (password === "" || email === "") {
       setDisabled(true);
     }
     setSubmit({ email, password });
-    console.log(submit);
+    navigation.navigate("Home");
+
+    const data = await signIn(email, password);
+    // console.log(data?.session?.access_token);
+    dispatch({ type: "login", payload: data?.session?.access_token });
+    console.log("estadooo", state);
   };
+
   return (
     <>
       <TopNavigation
@@ -57,29 +86,11 @@ const Login: FC<LoginProps> = ({ navigation }) => {
       />
       <Layout style={styles.container2}>
         {disabled ? (
-          <Layout style={styles.errorContainer}>
-            <Modal
-              style={styles.errorContainer}
-              visible={disabled}
-              backdropStyle={styles.backdrop}
-            >
-              <Card
-                disabled={true}
-                status="warning"
-                style={styles.errorContainer}
-              >
-                <Text category="h1">Error</Text>
-                <Text category="s1">Correo o contaseña invalida</Text>
-                <Button
-                  status="danger"
-                  style={styles.errorButton}
-                  onPress={() => setDisabled(false)}
-                >
-                  Continuar
-                </Button>
-              </Card>
-            </Modal>
-          </Layout>
+          <ErrorCard
+            setDisabled={setDisabled}
+            disabled={disabled}
+            message="Error Verifique que los datos sean correctos."
+          />
         ) : null}
         <Text category="h1">Login</Text>
 

@@ -9,7 +9,7 @@ import {
   Icon,
   Divider,
 } from "@ui-kitten/components";
-import { default as theme } from "../constants/theme.json";
+import { theme } from "../constants/theme";
 
 type WelcomeProps = {
   navigation: any;

@@ -1,6 +1,7 @@
 import {
   Button,
   Icon,
+  IconElement,
   Input,
   Layout,
   Text,
@@ -8,8 +9,13 @@ import {
   TopNavigationAction,
 } from "@ui-kitten/components";
 import React, { FC, useState } from "react";
-import { default as theme } from "../constants/theme.json";
-import { StyleSheet, View } from "react-native";
+
+import { StyleSheet, TouchableWithoutFeedback, View } from "react-native";
+import { reducer } from "../store/reducres";
+import { useAtom } from "jotai";
+import { signUpUser } from "../auth/signup";
+import { theme } from "../constants/theme";
+
 interface SignupProps {
   navigation: any;
 }
@@ -19,15 +25,73 @@ const Signup: FC<SignupProps> = ({ navigation }) => {
   const navigateBack = () => {
     navigation.goBack();
   };
+  const navigateHome = () => {
+    navigation.navigate("Home");
+  };
   const EmailIcon = (props: any) => (
     <Icon {...props} fill="#fff" name="email" />
+  );
+  const UserIcon = (props: any) => (
+    <Icon {...props} fill="#fff" name="person" />
   );
   const LockIcon = (props: any) => <Icon {...props} fill="#fff" name="lock" />;
   const BackAction = () => (
     <TopNavigationAction icon={BackIcon} onPress={navigateBack} />
   );
-  const [email, setEmail] = useState("");
-  const [confirmEmail, setConfirmEmail] = useState("");
+
+  const [email, setEmail] = useState<string>("");
+  const [name, setName] = useState<string>("");
+  const [confirmEmail, setConfirmEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [isequal, setisEqual] = useState<boolean>(true);
+  const [isEqualPass, setEqualPass] = useState<boolean>(true);
+  const [secureTextEntry, setSecureTextEntry] = useState(true);
+  const [secureTextEntryConfirm, setSecureTextEntryConfirm] = useState(true);
+  const toggleSecureEntry = (): void => {
+    setSecureTextEntry(!secureTextEntry);
+  };
+  const toggleSecureEntryConfirm = (): void => {
+    setSecureTextEntryConfirm(!secureTextEntryConfirm);
+  };
+  const CaptionMessage = (text: string): React.ReactElement => (
+    <View style={styles.captionContainer}>
+      <Text status="danger" style={styles.captionText}>
+        {text}
+      </Text>
+    </View>
+  );
+
+  const renderIcon = (props: any): React.ReactElement => (
+    <TouchableWithoutFeedback onPress={toggleSecureEntry}>
+      <Icon {...props} name={secureTextEntry ? "eye-off" : "eye"} />
+    </TouchableWithoutFeedback>
+  );
+  const renderIconConfitm = (props: any): React.ReactElement => (
+    <TouchableWithoutFeedback onPress={toggleSecureEntryConfirm}>
+      <Icon {...props} name={secureTextEntryConfirm ? "eye-off" : "eye"} />
+    </TouchableWithoutFeedback>
+  );
+  const submitRegister = () => {
+    if (email !== confirmEmail) {
+      setisEqual(false);
+      console.log("es falso");
+    } else if (password !== confirmPassword) {
+      setEqualPass(false);
+    } else if (!email.includes("@")) {
+      setisEqual(false);
+    } else {
+      setEqualPass(true);
+      setisEqual(true);
+      setEmail("");
+      setConfirmEmail("");
+      setName("");
+      setConfirmPassword("");
+      setPassword("");
+      signUpUser(email, password, name);
+      navigateHome();
+    }
+  };
   return (
     <>
       <TopNavigation
@@ -43,25 +107,45 @@ const Signup: FC<SignupProps> = ({ navigation }) => {
         <Layout style={styles.container}>
           <Layout style={styles.inputContainer}>
             <Input
+              accessoryLeft={UserIcon}
+              placeholder={"Nombre Completo"}
+              value={name}
+              style={styles.inputStyle}
+              onChangeText={(nextValue) => setName(nextValue)}
+            />
+            <Input
+              value={email}
               accessoryLeft={EmailIcon}
               placeholder="Email"
               placeholderTextColor={"white"}
               style={styles.inputStyle}
               textStyle={{ color: "white" }}
+              onChangeText={(nextValue) => setEmail(nextValue)}
             />
             <Input
+              value={confirmEmail}
               accessoryLeft={EmailIcon}
               placeholder="Confirm Email"
               placeholderTextColor={"white"}
               style={styles.inputStyle}
               textStyle={{ color: "white" }}
+              onChangeText={(nextValue) => setConfirmEmail(nextValue)}
+              caption={
+                isequal
+                  ? ""
+                  : CaptionMessage("Verifica que el correo sea valido.")
+              }
             />
             <Input
               accessoryLeft={LockIcon}
+              value={password}
               placeholder="Password"
               placeholderTextColor={"white"}
               style={styles.inputStyle}
               textStyle={{ color: "white" }}
+              secureTextEntry={secureTextEntry}
+              accessoryRight={renderIcon}
+              onChangeText={(nextValue) => setPassword(nextValue)}
             />
             <Input
               accessoryLeft={LockIcon}
@@ -69,11 +153,17 @@ const Signup: FC<SignupProps> = ({ navigation }) => {
               placeholderTextColor={"white"}
               style={styles.inputStyle}
               textStyle={{ color: "white" }}
+              value={confirmPassword}
+              accessoryRight={renderIconConfitm}
+              secureTextEntry={secureTextEntryConfirm}
+              caption={
+                isEqualPass
+                  ? ""
+                  : CaptionMessage("Los contraseña debe ser la misma.")
+              }
+              onChangeText={(nextValue) => setConfirmPassword(nextValue)}
             />
-            <Button
-              onPress={() => console.log("registrarse")}
-              style={styles.buttonStyle}
-            >
+            <Button onPress={submitRegister} style={styles.buttonStyle}>
               SUBMIT
             </Button>
           </Layout>
@@ -128,6 +218,21 @@ const styles = StyleSheet.create({
 
   backdrop: {
     backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+
+  captionContainer: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  captionIcon: {
+    width: 10,
+    height: 10,
+    marginRight: 5,
+  },
+  captionText: {
+    fontSize: 12,
+    fontWeight: "400",
   },
 });
 export default Signup;
